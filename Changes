@@ -1,5 +1,29 @@
 Revision history for Perl extension Bot::BasicBot::Pluggable.
 
+1.00 - 2016-06-13
+ - Match only one "word" in seen responses
+   Avoid silly mis-triggers.  GH PR-3 (bigpresh)
+
+ - Ignore links in messages from ourselves, so we avoid turtle
+   situations.  GH PR-2 (bigpresh)
+
+ - Karma plugin - match nicks with \S+, not \w+, so nicks with
+   hyphens in can have karma.  GH PR-1 (bigpresh)
+
+ - Better-document how said() resturn value is handled, to avoid
+   potential confusion.  GH PR-4 (bigpresh)
+
+
+*********************************************************************
+David Precious (BIGPRESH) taking over maintainership at this point,
+kind thanks to Mike Eldridge (DIZ) for kindly handing over
+maintainership to me.
+
+I still make active use of this bot framework, and want to see it
+continue to be loved and supported, so bug reports and pull requests
+are welcome!
+*********************************************************************
+
 0.97 - Thu Jun 14 10:39:29 CDT 2012
  - more fixes from bigpresh
     - fix regression in ChanOp->isop() introduced in 0.95 (thanks to ambs for finding it)
