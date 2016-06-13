@@ -281,14 +281,14 @@ explanations.
 Defaults to 1; whether to randomize the order of reasons. If set
 to 0, the reasons are sorted in reversed chronological order.
 
-=back
-
 =item karma_change_response
 
 Defaults to 1; whether to show a response when the karma of a
 thing is changed.  If true, the bot will reply with the new karma.
 If set to 0, the bot will silently update the karma, without
 a response.
+
+=back
 
 =head1 AUTHOR
 
