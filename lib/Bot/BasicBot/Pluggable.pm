@@ -586,7 +586,7 @@ and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Mike Eldridge <diz@cpan.org>
+David Precious (BIGPRESH) <davidp@preshweb.co.uk>
 
 I am merely the current maintainer; however, the AUTHOR heading is traditional.
 
@@ -599,6 +599,8 @@ I am merely the current maintainer; however, the AUTHOR heading is traditional.
 =item * Tom Insam <tom@jerakeen.org>
 
 =item * David Precious <davidp@preshweb.co.uk>
+
+=item * Mike Eldridge <diz@cpan.org>
 
 =back
 
@@ -618,6 +620,9 @@ including some /inspired/ calendar evilness.
 And thanks to the rest of #2lmc who were my unwilling guinea pigs during
 development. And who kept suggesting totally stupid ideas for modules that I
 then felt compelled to go implement. Shout.pm owes its existence to #2lmc.
+
+Thanks to Mike Eldridge (DIZ), maintainer until 2016, for kindly transferring
+maintainership to me, BIGPRESH, so I can keep this useful bot framework alive.
 
 =head1 SEE ALSO
 
