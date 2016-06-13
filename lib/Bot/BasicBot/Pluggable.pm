@@ -453,7 +453,7 @@ The perldoc pages for the various modules will list other commands.
 
 Bot::BasicBot::Pluggable started as Yet Another Infobot replacement, but now
 is a generalised framework for writing infobot-type bots that lets you keep
-each specific function seperate. You can have seperate modules for factoid
+each specific function separate. You can have separate modules for factoid
 tracking, 'seen' status, karma, googling, etc. Included default modules are
 below. Use C<perldoc Bot::BasicBot::Pluggable::Module::<module name>> for help
 on their individual terminology.
@@ -496,7 +496,7 @@ if not.
 
 Reload the module C<$module> - equivalent to unloading it (if it's already
 loaded) and reloading it. Will stomp the old module's namespace - warnings
-are expected here. Not toally clean - if you're experiencing odd bugs, restart
+are expected here. Not totally clean - if you're experiencing odd bugs, restart
 the bot if possible. Works for minor bug fixes, etc.
 
 =item unload($module)
@@ -545,7 +545,7 @@ It expects trace, debug, info, warn, error or fatal as value.
 
 Returns the bot configuration file for logging. Please refer to
 L<Log::Log4perl::Config> for the configurations files format. Setting
-this to a differant file after calling init() has no effect.
+this to a different file after calling init() has no effect.
 
 Returns or set 
 

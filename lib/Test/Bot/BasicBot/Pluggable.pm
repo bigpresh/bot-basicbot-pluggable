@@ -119,7 +119,7 @@ connecting to anything.
 
 =head2 DESTROY
 
-The special subrouting is explicitly overriden with an empty
+The special subroutine is explicitly overridden with an empty
 subroutine as otherwise AUTOLOAD in Bot::BasicBot will be called
 for it.
 
