@@ -316,7 +316,7 @@ This is so that all modules will at least see all messages. I suggest:
     return "OK!"; # "eat" the message and send a reply back to the user
   }
 
-The preferred way, however, is to override one of the seperate C<seen()>, C<admin()>,
+The preferred way, however, is to override one of the separate C<seen()>, C<admin()>,
 C<told()> and C<fallback()> methods, corresponding to priorities 0, 1, 2 and 3
 in order - this will lead to nicer code. This approach is new, though, which
 is why it's not yet used in most of the shipped modules yet. It will eventually
@@ -360,7 +360,7 @@ return value is ignored.
 
 =item authed($who)
 
-This is a convinient method that trys to check for the users
+This is a convenient method that tries to check for the users
 authentication level via Auth.pm. It is exactly equivalent to
 
     $self->bot->module('Auth')

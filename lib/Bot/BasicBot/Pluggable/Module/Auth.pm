@@ -214,10 +214,10 @@ as possible.
 
 If this variable is true, the implicit authentication handling is
 disabled. Every module will have to check for authentication via the
-authed method, otherwise access is just granted. This is only usefull
+authed method, otherwise access is just granted. This is only useful
 to allow modules to handle directives starting with an exclamation
 mark without needing any authentication. And to make things even more
-interesting, you won't be warned that you have't authenticated, so modules
+interesting, you won't be warned that you haven't authenticated, so modules
 needing authentication will fail without any warning. It defaults to
 false and should probably never be changed. You've been warned.
 
