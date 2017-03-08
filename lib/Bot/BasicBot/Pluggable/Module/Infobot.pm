@@ -302,7 +302,9 @@ sub get_raw_factoids {
 
         # it's a deep structure
         $is_are = $raw->{is_are};
-        @factoids = @{ $raw->{factoids} || [] };
+        @factoids = map {
+	    ref $_ && /DBM::Deep::Hash/ ? +{ %$_ } : $_
+	} @{ $raw->{factoids} || [] };
 
     }
     else {
