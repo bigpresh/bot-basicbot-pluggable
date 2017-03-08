@@ -134,6 +134,7 @@ sub fallback {
   # been addressed, c) the factoid is bigger and smaller than our requirements,
   # and d) that it doesn't look like a to-be-learned factoid (which is important
   # if the user has disabled the requiring of the question mark for answering.)
+    my $readdress = $mess->{channel} ne 'msg' && $body =~ s/\s+@\s+(\S+)[.]?\s*$// ? $1 : '';
     my $body_regexp =
       $self->get("user_require_question") && !$is_priv ? qr/\?+$/ : qr/[.!?]*$/;
     if (    $body =~ s/$body_regexp//
@@ -164,7 +165,7 @@ sub fallback {
         if ( $factoid =~ s/^<action>\s*//i ) {
             $self->bot->emote(
                 {
-                    who     => $mess->{who},
+                    who     => $readdress || $mess->{who},
                     channel => $mess->{channel},
                     body    => $factoid
                 }
@@ -175,13 +176,20 @@ sub fallback {
         }
         elsif ($literal) {
             $body =~ s!^literal\s+!!;
-            return "$body =${is_are}= $factoid";
+	    $factoid = "$body =${is_are}= $factoid";
         }
         else {
-            return $factoid =~ s/^<reply>\s*//i
+            $factoid = $factoid =~ s/^<reply>\s*//i
               ? $factoid
               : "$body $is_are $factoid";
         }
+	if ($readdress) {
+	    my %hash = %$mess;
+	    $hash{who} = $readdress;
+	    $self->reply(\%hash, $factoid);
+	    return 1;
+	}
+	return $factoid;
     }
 
     # the only thing left is learning factoids. are we
