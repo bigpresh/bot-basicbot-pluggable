@@ -21,7 +21,7 @@ sub told {
         my $module = $self->{Bot}->module($mod);
         return "No such module '$module'." unless $module;
         $value = defined($value) ? $value : '';    # wipe if no value.
-        $module->set( "user_$var", $value );
+        $module->set( "user_$var", $value ) if $var;
         return "Set.";
 
     }

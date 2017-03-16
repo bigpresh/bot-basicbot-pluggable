@@ -11,6 +11,7 @@ sub init {
             user_num_comments      => 3,
             user_show_givers       => 1,
             user_randomize_reasons => 1,
+	    user_karma_change_response => 1,
         }
     );
 }
@@ -122,7 +123,7 @@ sub get_karma {
     $thing = lc($thing);
     $thing =~ s/-/ /g;
 
-    my @changes = @{ $self->get("karma_$thing") || [] };
+    my @changes = grep { ref } @{ $self->get("karma_$thing") || [] };
 
     my ( @good, @bad );
     my $karma    = 0;
@@ -133,8 +134,8 @@ sub get_karma {
 
         # just push non empty reasons on the array
         my $reason = $row->{reason};
-        if ( $row->{positive} ) { $positive++; push( @good, $row ) if $reason }
-        else                    { $negative++; push( @bad, $row ) if $reason }
+        if ( $row->{positive} ) { $positive++; push( @good, +{ %$row } ) if $reason }
+        else                    { $negative++; push( @bad, +{ %$row } ) if $reason }
     }
     $karma = $positive - $negative;
 
@@ -158,7 +159,7 @@ sub add_karma {
     $thing =~ s/-/ /g;
     my $row =
       { reason => $reason, who => $who, timestamp => time, positive => $good };
-    my @changes = @{ $self->get("karma_$thing") || [] };
+    my @changes = map { +{ %$_ } } grep { ref } @{ $self->get("karma_$thing") || [] };
     push @changes, $row;
     $self->set( "karma_$thing" => \@changes );
     my $respond = $self->get('user_karma_change_response');

@@ -9,7 +9,7 @@ sub connected {
 
     ## If we are not a array reference, we are problably the old
     ## string format ... trying to convert
-    if ( not ref($channels) eq 'ARRAY' ) {
+    if ( not ref($channels) && $channels =~ 'ARRAY' ) {
         $channels = [ split( /\s+/, $channels ) ];
     }
 
@@ -72,14 +72,14 @@ sub told {
 sub chanjoin {
     my ( $self, $mess ) = @_;
     if ( $mess->{who} eq $self->bot->nick ) {
-        $self->set( channels => $self->bot->channels );
+        $self->set( channels => [ $self->bot->channels ] );
     }
 }
 
 sub chanpart {
     my ( $self, $mess ) = @_;
     if ( $mess->{who} eq $self->bot->nick ) {
-        $self->set( channels => $self->bot->channels );
+        $self->set( channels => [ $self->bot->channels ] );
     }
 }
 

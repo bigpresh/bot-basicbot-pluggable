@@ -176,7 +176,15 @@ sub handler {
 
 sub handlers {
     my $self = shift;
-    my @keys = keys( %{ $self->{handlers} } );
+    my @keys = sort {
+	my $xa = $self->handler($a);
+	my $xb = $self->handler($b);
+	(
+	    ($xb->get('user_priority') || $xb->get('priority') || 0)
+		<=>
+	    ($xa->get('user_priority') || $xa->get('priority') || 0)
+	) || ($a cmp $b)
+    } keys( %{ $self->{handlers} } );
     return @keys if wantarray;
     return \@keys;
 }

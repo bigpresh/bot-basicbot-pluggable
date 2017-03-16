@@ -50,6 +50,8 @@ has channel => (
 );
 has password => ( is => 'rw', isa => 'Str' );
 has port => ( is => 'rw', isa => 'Int', default => 6667 );
+has useipv6  => ( is => 'rw', isa => 'Bool', default => 1 );
+has localaddr => ( is => 'rw', isa => 'Str' );
 has bot_class =>
   ( is => 'rw', isa => 'Str', default => 'Bot::BasicBot::Pluggable' );
 
@@ -143,6 +145,8 @@ sub _create_bot {
         nick      => $self->nick(),
         charset   => $self->charset(),
         port      => $self->port(),
+        useipv6   => $self->useipv6(),
+        localaddr => $self->localaddr(),
         store     => $self->store(),
         loglevel  => $self->loglevel(),
         logconfig => $self->logconfig(),

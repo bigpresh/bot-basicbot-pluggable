@@ -6,7 +6,7 @@ use Try::Tiny;
 
 sub init {
     my $self    = shift;
-    my @modules = $self->store_keys;
+    my @modules = grep !/^user_/, $self->store_keys;
     for (@modules) {
         try { $self->{Bot}->load($_) } catch { warn "Error loading $_: $@." };
     }

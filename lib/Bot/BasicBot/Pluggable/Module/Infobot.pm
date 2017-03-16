@@ -10,6 +10,8 @@ use URI;
 # this one is a complete bugger to build
 eval { require XML::Feed };
 our $HAS_XML_FEED = $@ ? 0 : 1;
+use constant PROT => "ibprot_";
+use constant INFO => "infobot_";
 
 sub init {
     my $self = shift;
@@ -38,11 +40,12 @@ sub init {
 
 sub help {
     return
-"An infobot. See http://search.cpan.org/perldoc?Bot::BasicBot::Pluggable::Module::Infobot.";
+"An infobot. See http://search.mcpan.org/perldoc?Bot::BasicBot::Pluggable::Module::Infobot.";
 }
 
 sub told {
     my ( $self, $mess ) = @_;
+    local $self->{mess} = $mess;
     my $body = $mess->{body};
     return unless defined $body;
 
@@ -56,9 +59,11 @@ sub told {
 
     # forget a particular factoid.
     if ( $body =~ /^forget\s+(.*)$/i ) {
-        return $self->delete_factoid($1)
-          ? "I forgot about $1."
-          : "I don't know anything about $1.";
+	unless ($self->protection_status($mess, $1)) {
+	    return $self->delete_factoid($1)
+		? "I forgot about $1."
+		: "I don't know anything about $1.";
+	}
     }
 
     # ask another bot for facts.
@@ -83,10 +88,27 @@ sub told {
           unless $#results < $self->get("user_num_results");
         return "I know about: " . join( ", ", map { "'$_'" } @results ) . ".";
     }
+
+    if ($self->authed( $mess->{who} )) {
+	# protect a particular factoid.
+	if ( $body =~ /^protect\s+(.*)$/i ) {
+	    return $self->protect_factoid($1)
+		? "Protected $1."
+		: "Already protected.";
+	}
+
+	# unprotect a particular factoid.
+	if ( $body =~ /^unprotect\s+(.*)$/i ) {
+	    return $self->unprotect_factoid($1)
+		? "Unprotected $1."
+		: "Was not protected";
+	}
+    }
 }
 
 sub fallback {
     my ( $self, $mess ) = @_;
+    local $self->{mess} = $mess;
     my $body = $mess->{body} || "";
 
     my $is_priv = !defined $mess->{channel} || $mess->{channel} eq 'msg';
@@ -112,6 +134,7 @@ sub fallback {
   # been addressed, c) the factoid is bigger and smaller than our requirements,
   # and d) that it doesn't look like a to-be-learned factoid (which is important
   # if the user has disabled the requiring of the question mark for answering.)
+    my $readdress = $mess->{channel} ne 'msg' && $body =~ s/\s+@\s+(\S+)[.]?\s*$// ? $1 : '';
     my $body_regexp =
       $self->get("user_require_question") && !$is_priv ? qr/\?+$/ : qr/[.!?]*$/;
     if (    $body =~ s/$body_regexp//
@@ -142,7 +165,7 @@ sub fallback {
         if ( $factoid =~ s/^<action>\s*//i ) {
             $self->bot->emote(
                 {
-                    who     => $mess->{who},
+                    who     => $readdress || $mess->{who},
                     channel => $mess->{channel},
                     body    => $factoid
                 }
@@ -153,13 +176,20 @@ sub fallback {
         }
         elsif ($literal) {
             $body =~ s!^literal\s+!!;
-            return "$body =${is_are}= $factoid";
+	    $factoid = "$body =${is_are}= $factoid";
         }
         else {
-            return $factoid =~ s/^<reply>\s*//i
+            $factoid = $factoid =~ s/^<reply>\s*//i
               ? $factoid
               : "$body $is_are $factoid";
         }
+	if ($readdress) {
+	    my %hash = %$mess;
+	    $hash{who} = $readdress;
+	    $self->reply(\%hash, $factoid);
+	    return 1;
+	}
+	return $factoid;
     }
 
     # the only thing left is learning factoids. are we
@@ -188,7 +218,9 @@ sub fallback {
     # if we're replacing things, remove the factoid first.
     # $also check supports "no, $bot, $object is also $fact".
     if ( $replace and !$also ) {
-        $self->delete_factoid($object);
+	unless ($self->protection_status($mess, $object)) {
+	    $self->delete_factoid($object);
+	}
     }
 
     # get any current factoid there might be.
@@ -203,11 +235,13 @@ sub fallback {
         return;
     }
 
-    # add this factoid. this comment is absolutely useless. excelsior.
-    $self->add_factoid( $object, $is_are, split( /\s+or\s+/, $description ) );
+    unless ( $self->protection_status($mess, $object) ) {
+	# add this factoid. this comment is absolutely useless. excelsior.
+	$self->add_factoid( $object, $is_are, split( /\s+or\s+/, $description ) );
 
-    # return an ack if we were addressed only
-    return $mess->{address} ? "Okay." : 1;
+	# return an ack if we were addressed only
+	return $mess->{address} ? "Okay." : 1;
+    }
 }
 
 sub get_factoid {
@@ -266,7 +300,7 @@ sub get_factoid {
 # factoid.
 sub get_raw_factoids {
     my ( $self, $object ) = @_;
-    my $raw = $self->get( "infobot_" . lc($object) )
+    my $raw = $self->get( INFO . lc($object) )
       or return ();
 
     #print STDERR Dumper($raw);
@@ -276,7 +310,9 @@ sub get_raw_factoids {
 
         # it's a deep structure
         $is_are = $raw->{is_are};
-        @factoids = @{ $raw->{factoids} || [] };
+        @factoids = map {
+	    ref $_ && /DBM::Deep::Hash/ ? +{ %$_ } : $_
+	} @{ $raw->{factoids} || [] };
 
     }
     else {
@@ -319,16 +355,46 @@ sub add_factoid {
     };
 
     # put the list back into the store.
-    $self->set( "infobot_" . lc($object), $set );
+    $self->set( INFO . lc($object), $set );
 
     return 1;
 }
 
+sub protection_status {
+    my $self = shift;
+    my ($mess, $object) = @_;
+    $self->get( PROT . lc($object) ) && !$self->authed( $mess->{who} )
+}
+
 sub delete_factoid {
     my ( $self, $object ) = @_;
-    my $key = "infobot_" . lc($object);
+    my $key = INFO . lc($object);
     if ( $self->get($key) ) {
-        $self->unset( "infobot_" . lc($object) );
+        $self->unset( INFO . lc($object) );
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub protect_factoid {
+    my ( $self, $object ) = @_;
+    my $key = PROT . lc($object);
+    unless ( $self->get($key) ) {
+        $self->set( $key, 1 );
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub unprotect_factoid {
+    my ( $self, $object ) = @_;
+    my $key = PROT . lc($object);
+    if ( $self->get($key) ) {
+        $self->unset( $key );
         return 1;
     }
     else {
@@ -372,7 +438,7 @@ sub search_factoid {
     my @keys;
     for (@terms) {
         push @keys,
-          map { my $term = $_; $term =~ s/^infobot_// ? $term : () }
+          map { my $term = $_; $term =~ s/^${\(INFO)}// ? $term : () }
           $self->store_keys(
             limit => $self->get("user_num_results"),
             res   => ["$_"]
