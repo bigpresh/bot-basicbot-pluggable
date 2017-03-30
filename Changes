@@ -1,5 +1,12 @@
 Revision history for Perl extension Bot::BasicBot::Pluggable.
 
+1.10 - 2017-03-30
+ - Support "private" channels, which still show up in seen responses,
+   but without leaking the contents of messages in that channel to other
+   channels
+
+ - Handle "seen" on one's self better
+
 1.00 - 2016-06-13
  - Match only one "word" in seen responses
    Avoid silly mis-triggers.  GH PR-3 (bigpresh)
