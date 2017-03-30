@@ -70,6 +70,16 @@ sub told {
 
     if ( $command eq "seen" and $param =~ /^(\S+)\??$/ ) {
         my $who  = lc($1);
+
+        # First off, if they're asking about themselves, it's easy
+        if ($who eq lc $mess->{who}) {
+            $self->bot->emote(
+                channel => $mess->{channel},
+                body => "hands $who a mirror",
+            );
+            return;
+        }
+
         my $seen = $self->get("seen_$who");
     
         my $ignore_channels = $self->get('user_ignore_channels') || {};
