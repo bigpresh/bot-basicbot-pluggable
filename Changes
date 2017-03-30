@@ -7,6 +7,13 @@ Revision history for Perl extension Bot::BasicBot::Pluggable.
 
  - Handle "seen" on one's self better
 
+ - Various contributions from ailin-nemui in PR-7, including:
+  - IPv6 support
+  - Setting module priorities 
+  - Bugfixes for using the DBM::Deep store
+  - Ability to protect infobot factoids
+  - Ability to send other users factoids in public
+
 1.00 - 2016-06-13
  - Match only one "word" in seen responses
    Avoid silly mis-triggers.  GH PR-3 (bigpresh)
