@@ -114,8 +114,8 @@ sub told {
         $self->unset("hide_$nick");
         return "Ok, you're visible to seen status.";
     }
-    elsif ( my ($action, $type) = $command =~ /^((?:un)?hide|private)chan$/ ) {
-        $action = $action ? 'add' : 'remove';
+    elsif ( my ($action, $type) = $command =~ /^(un)?(hide|private)chan$/ ) {
+        $action = $action ? 'remove' : 'add';
         my $response;
         my $reply_action = {
             hide => "tracking users",
