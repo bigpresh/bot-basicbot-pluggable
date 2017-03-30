@@ -14,11 +14,13 @@ sub help {
     return
 "Tracks when and where people were last seen. 
 Usage:
-seen <nick>      (find out where 'nick' was last seen)
-hide             (Start hiding yourself from 'seen' reporting)
-unhide           (Stop  hiding yourself from 'seen' reporting)
-hidechan   #chan (Hide a private channel from seen reporting)
-unhidechan #chan (Stop hiding a private channel from seen reporting)
+seen <nick>         (find out where 'nick' was last seen)
+hide                (Start hiding yourself from 'seen' reporting)
+unhide              (Stop  hiding yourself from 'seen' reporting)
+hidechan      #chan (Hide a private channel from seen reporting)
+unhidechan    #chan (Stop hiding a private channel from seen reporting)
+privatechan   #chan (Don't show message contents from #chan in other channels)
+unprivatechan #chan (Show message contents from #chan in other channels)
 ";
 }
 
@@ -68,6 +70,16 @@ sub told {
 
     if ( $command eq "seen" and $param =~ /^(\S+)\??$/ ) {
         my $who  = lc($1);
+
+        # First off, if they're asking about themselves, it's easy
+        if ($who eq lc $mess->{who}) {
+            $self->bot->emote(
+                channel => $mess->{channel},
+                body => "hands $who a mirror",
+            );
+            return;
+        }
+
         my $seen = $self->get("seen_$who");
     
         my $ignore_channels = $self->get('user_ignore_channels') || {};
@@ -79,6 +91,16 @@ sub told {
         ) {
             return "Sorry, I haven't seen $1.";
         }
+
+        # If the channel is private, and it's a different channel to the one we
+        # are in, hide what they were saying
+        my $private_channels = $self->get('user_private_channels') || {};
+        if (exists $private_channels->{ $seen->{channel} }
+            && $mess->{channel} ne $seen->{channel})
+        {
+            $seen->{what} = "saying something";
+        }
+
 
         my $diff        = time - $seen->{time};
         my $time_string = secs_to_string($diff);
@@ -102,18 +124,24 @@ sub told {
         $self->unset("hide_$nick");
         return "Ok, you're visible to seen status.";
     }
-    elsif ( my ($chanhideaction) = $command =~ /^(hide|unhide)chan$/ ) {
+    elsif ( my ($action, $type) = $command =~ /^(un)?(hide|private)chan$/ ) {
+        $action = $action ? 'remove' : 'add';
         my $response;
+        my $reply_action = {
+            hide => "tracking users",
+            private => "externally revealing messages from users",
+        }->{$type};
+
         if ($self->authed($mess->{who})) {
-            my $ignore_channels = $self->get('user_ignore_channels') || {};
-            if ($chanhideaction eq 'hide') {
-                $ignore_channels->{$param}++;
-                $response = "OK, not tracking users in $param";
+            my $channels = $self->get('user_' . $type .'_channels') || {};
+            if ($action eq 'add') {
+                $channels->{$param}++;
+                $response = "OK, not $reply_action in $param";
             } else {
-                delete $ignore_channels->{$param};
-                $response =  "OK, tracking users in $param";
+                delete $channels->{$param};
+                $response =  "OK, $reply_action in $param";
             }
-            $self->set('user_ignore_channels', $ignore_channels);
+            $self->set('user_' . $type . '_channels', $channels);
             return $response;
         } else {
             return "You need to be authenticated to do that.";
