@@ -1,5 +1,8 @@
 Revision history for Perl extension Bot::BasicBot::Pluggable.
 
+1.11 - 2017-03-31
+ - Fix deps list (MooseX::GetOpt -> ::Getopt)
+
 1.10 - 2017-03-30
  - Support "private" channels, which still show up in seen responses,
    but without leaking the contents of messages in that channel to other
