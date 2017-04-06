@@ -347,7 +347,7 @@ BEGIN {
     my @dispatchable_events = (
         qw/
           connected chanjoin chanpart userquit nick_change
-          topic kicked
+          topic kicked raw_in raw_out
           /
     );
     my @priority_events = (qw/ said emoted /);
