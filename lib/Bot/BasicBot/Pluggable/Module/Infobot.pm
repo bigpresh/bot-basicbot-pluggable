@@ -601,6 +601,9 @@ Finally, you can privmsg the bot to search for particular facts:
 
 =head1 VARS
 
+All of these are configurable via the Vars module, i.e. they have a C<user_>
+prefix in the store.
+
 =over 4
 
 =item min_length
