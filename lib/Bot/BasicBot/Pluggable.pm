@@ -202,7 +202,7 @@ sub remove_handler {
     my ( $self, $name ) = @_;
     my $logger = Log::Log4perl->get_logger( ref $self );
     $logger->logdie("Need a name for removing a handler") unless $name;
-    $logger->logdie("Hander $name not defined")
+    $logger->logdie("Handler $name not defined")
       unless $self->{handlers}{ lc($name) };
     $self->{handlers}{ lc($name) }->stop();
     delete $self->{handlers}{ lc($name) };
@@ -514,7 +514,7 @@ Removes a module from the bot. It won't get events any more.
 =item module($module)
 
 Returns the handler object for the loaded module C<$module>. Used, e.g.,
-to get the 'Auth' hander to check if a given user is authenticated.
+to get the 'Auth' handler to check if a given user is authenticated.
 
 =item modules
 
