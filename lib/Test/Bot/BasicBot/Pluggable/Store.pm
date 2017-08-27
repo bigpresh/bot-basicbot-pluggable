@@ -59,7 +59,7 @@ basic store_ok.
 
 This functions justs tests some basic behaviour every storage module
 should provide, like store creation, get and set. You can't use it
-directly with Test::More as we harcode the number of tests to nine
+directly with Test::More as we hardcode the number of tests to nine
 in the moment. (Man, i'm so excited about nested tap streams in the
 newest development release of Test::Simple)
 
