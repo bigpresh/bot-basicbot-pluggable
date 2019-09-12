@@ -384,20 +384,19 @@ Bot::BasicBot::Pluggable - extended simple IRC bot for pluggable modules
 
   # with useful options. pass any option
   # that's valid for Bot::BasicBot.
-  my $bot = Bot::BasicBot::Pluggable->new(
-  
-                      channels => ["#bottest"],
-                      server   => "irc.example.com",
-                      port     => "6667",
+my $bot = Bot::BasicBot::Pluggable->new(
+    channels => ["#bottest"],
+    server   => "irc.example.com",
+    port     => "6667",
 
-                      nick     => "pluggabot",
-                      altnicks => ["pbot", "pluggable"],
-                      username => "bot",
-                      name     => "Yet Another Pluggable Bot",
+    nick      => "pluggabot",
+    alt_nicks => ["pbot", "pluggable"],
+    username  => "bot",
+    name      => "Yet Another Pluggable Bot",
 
-                      ignore_list => [qw(hitherto blech muttley)],
+    ignore_list => [qw(hitherto blech muttley)],
 
-                );
+);
 
 =head2 Running the bot (simple)
 
