@@ -27,7 +27,7 @@ sub dbh {
 sub create_table {
     my $self  = shift;
     my $table = $self->{table} or die "Need DB table";
-    my $sth   = $self->dbh->table_info( '', '', $table, "TABLE" );
+    my $sth   = $self->dbh->table_info( '%', '%', $table, "TABLE" );
 
 	$table = $self->dbh->quote_identifier($table);
 
